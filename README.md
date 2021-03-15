@@ -1,1 +1,2 @@
-# CS541_Group
+# Meta Learning Autoencoders for Remote Sensing
+
