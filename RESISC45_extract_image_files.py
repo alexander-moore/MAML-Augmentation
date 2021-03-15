@@ -64,7 +64,7 @@ for scene_num, scene_name in enumerate(scenes):
     print(scene_num, scene_name)
     class_names.append(scene_name)
     
-    for idx in range(1,700):
+    for idx in range(1,701):
         img_filename = filepath + scene_name + '/' + scene_name + '_' + str(idx).zfill(3) + '.jpg'
         img = cv2.imread(img_filename)
         img_list.append(img)
