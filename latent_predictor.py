@@ -3,7 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 
-def fit_optim_predictor(model, xtrain, ytrain, xval, yval, xtest, ytest):
+def fit_optim_predictor(model, xtrain, ytrain, xtest, ytest):
 	# Pass an AE, train val test image sets, and corresp labels
 
 	# Labels should be the default data format (integers, not one-hot)
@@ -12,11 +12,10 @@ def fit_optim_predictor(model, xtrain, ytrain, xval, yval, xtest, ytest):
 	# Given an autoencoder model, optimize a classifier in the latent space over a gridsearch validation
 	# Return this classifier and it's scores
 
-	xtrain = model.encode(xtrain)
-	xval = model.encode(xval)
-	xtest = model.encode(xtest)
+	xtrain = model.encode(xtrain).squeeze()
+	xtest = model.encode(xtest).squeeze()
 
-	tuned_parameters = [{'n_estimators'}: [50, 100, 150], {'min_samples_split'}: [2, 8, 32], {'max_depth'}: [1,2,4]]
+	tuned_parameters = [{'n_estimators': [50, 100, 150], 'min_samples_split': [2, 8, 32], 'max_depth': [1,2,4]}]
 
 	scores = ['f1_score']
 
@@ -47,7 +46,7 @@ def fit_optim_predictor(model, xtrain, ytrain, xval, yval, xtest, ytest):
 	    print("The model is trained on the full development set.")
 	    print("The scores are computed on the full evaluation set.")
 	    print()
-	    y_true, y_pred = y_test, clf.predict(X_test)
+	    y_true, y_pred = ytest, clf.predict(xtest)
 	    final_report = classification_report(y_true, y_pred)
 	    print(final_report)
 	    print()
