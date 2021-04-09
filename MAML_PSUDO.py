@@ -12,8 +12,8 @@ meta_optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 outer_loss = 0
 for task in batch: #pull a task
      ## sample for the task, we need to have the struture to allow the following:
-    train_inputs, train_targets = task["independent"] ## pull from the same task independent sets same augments different data
-    test_inputs, test targets = task["dependent"] ## pull from the same task independent sets same augments diffrent data
+    train_inputs, train_targets = task["inner"] ## pull from the same task independent sets same augments different data
+    test_inputs, test targets = task["outer"] ## pull from the same task independent sets same augments diffrent data
 
 
     train_logit = model(train_input)
