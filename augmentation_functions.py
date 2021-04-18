@@ -10,6 +10,7 @@ Original file is located at
 import numpy as np
 import itertools
 import torch
+import torchvision
 from torchvision import transforms
 
 class addGaussianNoise(object):
@@ -51,6 +52,32 @@ def applyAugs(img_batch, task_idx, num_augs=7):
     transform = torchvision.transforms.Compose(task_transforms)
     img_batch = transform(img_batch)
     return img_batch
+
+def getAugmentationTransforms(task_idx, num_augs=7):
+    # returns transforms.Compose function of transforms based on task index (0:128)
+    # currently based on exactly 7 transforms 
+
+    transform_list = [transforms.RandomHorizontalFlip(p=0.99),
+                      transforms.RandomVerticalFlip(p=0.99),
+                      transforms.RandomRotation(359.0, fill=0.5),
+                      transforms.RandomPerspective(distortion_scale=0.1, p=0.99, fill=0.5),
+                      transforms.RandomResizedCrop(256,
+                                                   scale=(0.5, 1.0),
+                                                   ratio=(1.0, 1.0),
+                                                   interpolation=transforms.InterpolationMode.BILINEAR),
+                      addGaussianNoise(std=0.1, p=0.99),
+                      # transforms.ColorJitter(saturation=4.0, hue=0.01),
+                      transforms.ColorJitter(brightness=0.5, contrast=0.9)
+                      # ,transforms.GaussianBlur(9, sigma=(0.01, 2.0))
+                      ]
+       
+    tasklist = list(itertools.product([0, 1], repeat=num_augs))
+    current_augs = tasklist[task_idx]
+
+    task_transforms = [transform_list[i] for i,x in enumerate(current_augs) if x==1]
+    transform = torchvision.transforms.Compose(task_transforms)
+
+    return transform
 
 # utility functions
 # images must be normalized and converted to torch shape before augmentations (3,h,w)
