@@ -140,7 +140,10 @@ def fit_optim_predictor(AE, train_data, train_labels, test_data, test_labels):
 	    torch.save(test_embedded, 'test_embed.pt')
 	    torch.save(test_y, 'test_y.pt')
 
-    tuned_parameters = [{'n_estimators': [100, 150, 200], 'min_samples_split': [1,2,4,8], 'max_depth': [2,3,4,5]}]
+    parameters = {'n_estimators': [500, 1000, 2000],
+              'criterion': ['entropy'], 
+              'max_depth': [25, 35, 45], 
+              'min_samples_split': [2]}
 
     #scores = [sorted(sklearn.metrics.SCORERS.keys())]
     #"['accuracy', 'adjusted_mutual_info_score', 'adjusted_rand_score', 'average_precision', 'balanced_accuracy', 'completeness_score', 'explained_variance', 'f1', 'f1_macro', 'f1_micro', 
@@ -149,7 +152,7 @@ def fit_optim_predictor(AE, train_data, train_labels, test_data, test_labels):
     #'neg_median_absolute_error', 'neg_root_mean_squared_error', 'normalized_mutual_info_score', 'precision', 'precision_macro', 'precision_micro', 'precision_samples', 'precision_weighted', 
     #'r2', 'recall', 'recall_macro', 'recall_micro', 'recall_samples', 'recall_weighted', 'roc_auc', 'roc_auc_ovo', 'roc_auc_ovo_weighted', 'roc_auc_ovr', 'roc_auc_ovr_weighted', 'v_measure_score']_macro"
 
-    n_samps = 2500
+    n_samps = 500
 
     train_data = train_embedded[0:n_samps].cpu()
     train_y = train_y[0:n_samps].cpu()
@@ -157,19 +160,22 @@ def fit_optim_predictor(AE, train_data, train_labels, test_data, test_labels):
     val_data = val_embedded[0:n_samps].cpu()
     val_y = val_y[0:n_samps].cpu()
 
+    print(train_data.shape)
+    print(val_data.shape)
+
     scores = ['accuracy', 'average_precision', 'mutual_info_score']
 
-    if True:
+    if False:
     ## RandomForestClassifier
-        model = sklearn.ensemble.RandomForestClassifier()
-        parameters = tuned_parameters
+        model = sklearn.tree.DecisionTreeClassifier()
         clf = GridSearchCV(model, parameters)
         print(train_data.shape, train_y.shape)
         clf.fit(train_data, train_y)
         print('RFC: ', clf.best_params_)
         best = clf.best_params_
-        Tmodel = sklearn.ensemble.RandomForestClassifier(n_estimators = best['n_estimators'],
+        Tmodel = sklearn.tree.DecisionTreeClassifier(max_features = best['max_features'],
                                                         max_depth = best['max_depth'],
+                                                        criterion = best['criterion'],
                                                         min_samples_split = best['min_samples_split'])
 
         Tmodel.fit(train_data, train_y)
@@ -178,22 +184,22 @@ def fit_optim_predictor(AE, train_data, train_labels, test_data, test_labels):
         val_acc = sklearn.metrics.accuracy_score(val_y, y_pred)
         val_amis = sklearn.metrics.adjusted_mutual_info_score(val_y, y_pred)
         val_f1 = sklearn.metrics.f1_score(val_y, y_pred, average = 'weighted')
-        val_bsl = sklearn.metrics.brier_score_loss(val_y, y_pred)
+        #val_bsl = sklearn.metrics.brier_score_loss(val_y, y_pred)
 
-        print(val_acc, val_amis, val_f1, val_bsl)
+        print(val_acc, val_amis, val_f1)
 
-    if False:
-    ## LinearClassifier
-        model = sklearn.linear_model.RidgeClassifierCV()
-        parameters = {'alphas':[0, 0.001, 0.01, 0.1, 0.25], 
-                      'fit_intercept':[0,1]}
+    if True:
+    ## RandomForestClassifier
+        model = sklearn.ensemble.RandomForestClassifier()
         clf = GridSearchCV(model, parameters)
         print(train_data.shape, train_y.shape)
         clf.fit(train_data, train_y)
         print('RFC: ', clf.best_params_)
         best = clf.best_params_
-        Tmodel = sklearn.ensemble.RandomForestClassifier(alphas = best['alphas'],
-                                                        fit_intercept = best['fit_intercept'])
+        Tmodel = sklearn.ensemble.RandomForestClassifier(n_estimators = best['n_estimators'],
+                                                        max_depth = best['max_depth'],
+                                                        criterion = best['criterion'],
+                                                        min_samples_split = best['min_samples_split'])
 
         Tmodel.fit(train_data, train_y)
         y_pred = Tmodel.predict(val_data)
@@ -201,6 +207,27 @@ def fit_optim_predictor(AE, train_data, train_labels, test_data, test_labels):
         val_acc = sklearn.metrics.accuracy_score(val_y, y_pred)
         val_amis = sklearn.metrics.adjusted_mutual_info_score(val_y, y_pred)
         val_f1 = sklearn.metrics.f1_score(val_y, y_pred, average = 'weighted')
-        val_bsl = sklearn.metrics.brier_score_loss(val_y, y_pred)
+        #val_bsl = sklearn.metrics.brier_score_loss(val_y, y_pred)
 
-        print(val_acc, val_amis, val_f1, val_bsl)
+        print(val_acc, val_amis, val_f1)
+
+    if False:
+    ## LinearClassifier
+        model = sklearn.linear_model.LogisticRegression(max_iter = 2000)
+        parameters = {'fit_intercept':[0,1]}
+        clf = GridSearchCV(model, parameters)
+        print(train_data.shape, train_y.shape)
+        clf.fit(train_data, train_y)
+        print('RFC: ', clf.best_params_)
+        best = clf.best_params_
+        Tmodel = sklearn.linear_model.LogisticRegression(fit_intercept = best['fit_intercept'])
+
+        Tmodel.fit(train_data, train_y)
+        y_pred = Tmodel.predict(val_data)
+
+        val_acc = sklearn.metrics.accuracy_score(val_y, y_pred)
+        val_amis = sklearn.metrics.adjusted_mutual_info_score(val_y, y_pred)
+        val_f1 = sklearn.metrics.f1_score(val_y, y_pred, average = 'weighted')
+        #val_bsl = sklearn.metrics.brier_score_loss(val_y, y_pred)
+
+        print(val_acc, val_amis, val_f1)
