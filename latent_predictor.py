@@ -177,10 +177,10 @@ def fit_optim_predictor(AE, train_data, train_labels, test_data, test_labels):
     if True:
     ## SVM
         model = sklearn.svm.SVC()
-        parameters = {'C': [0.1, 1.0, 2.0, 3.0, 4.0],
-              'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-              'coef0': [0.0, 0.1, 1],
-              'degree': [1,2,3]}
+        parameters = {'C': [1.0, 1.8, 2.0, 2.2, 3.0],
+              'kernel': ['linear','rbf'],
+              'coef0': [0.0],
+              'degree': [1,2]}
         clf = GridSearchCV(model, parameters)
         print(train_data.shape, train_y.shape)
         clf.fit(train_data, train_y)
