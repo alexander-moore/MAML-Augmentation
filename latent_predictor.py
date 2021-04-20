@@ -140,10 +140,10 @@ def fit_optim_predictor(AE, train_data, train_labels, test_data, test_labels):
 	    torch.save(test_embedded, 'test_embed.pt')
 	    torch.save(test_y, 'test_y.pt')
 
-    parameters = {'n_estimators': [500, 1000, 2000],
+    parameters = {'n_estimators': [450, 500, 750],
               'criterion': ['entropy'], 
-              'max_depth': [25, 35, 45], 
-              'min_samples_split': [2]}
+              'max_depth': [35, 45, 55], 
+              'min_samples_split': [2, 4]}
 
     #scores = [sorted(sklearn.metrics.SCORERS.keys())]
     #"['accuracy', 'adjusted_mutual_info_score', 'adjusted_rand_score', 'average_precision', 'balanced_accuracy', 'completeness_score', 'explained_variance', 'f1', 'f1_macro', 'f1_micro', 
@@ -207,9 +207,11 @@ def fit_optim_predictor(AE, train_data, train_labels, test_data, test_labels):
         val_acc = sklearn.metrics.accuracy_score(val_y, y_pred)
         val_amis = sklearn.metrics.adjusted_mutual_info_score(val_y, y_pred)
         val_f1 = sklearn.metrics.f1_score(val_y, y_pred, average = 'weighted')
+        y_pdf = Tmodel.decision_function(val_data)
+        val_t5 = sklearn.metrics.top_k_accuracy_score(val_y, y_pdf)
         #val_bsl = sklearn.metrics.brier_score_loss(val_y, y_pred)
 
-        print(val_acc, val_amis, val_f1)
+        print(val_acc, val_amis, val_f1, val_t5)
 
     if False:
     ## LinearClassifier
