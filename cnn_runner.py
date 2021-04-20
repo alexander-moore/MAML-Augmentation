@@ -62,11 +62,11 @@ def run_experiment(bs, n_epochs, lr, augmentations):
 
     # In[5]:
 
-    if os.path.isfile('train_loader.pth'):
-    	train_loader = torch.load('train_loader.pth')
-    	val_loader = torch.load('val_loader.pth')
+    #if os.path.isfile('train_loader.pth'):
+   # 	train_loader = torch.load('train_loader.pth')
+   # 	val_loader = torch.load('val_loader.pth')
 
-    else:
+    if True:
 	    xtrain, xval, ytrain, yval = train_test_split(train_data, train_labels, test_size = 0.25)
 
 	    xtrain = torch.tensor(xtrain).permute(0,3,1,2)
@@ -219,9 +219,9 @@ def run_experiment(bs, n_epochs, lr, augmentations):
             transforms.RandomHorizontalFlip(p=0.3),
             transforms.RandomVerticalFlip(p=0.3),
             transforms.RandomPerspective(distortion_scale=0.1, p=0.3, fill=0.5),
-            transforms.RandomAffine(180),
-            transforms.RandomResizedCrop(96),
-            transforms.ColorJitter(saturation=0.2, hue=0.01)
+            transforms.RandomAffine(180)
+            #transforms.RandomResizedCrop(96),
+            #transforms.ColorJitter(saturation=0.2, hue=0.01)
             #transforms.ColorJitter(brightness=0.2, contrast=0.2)
             ])
 
