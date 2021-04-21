@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 indir = ''
 infile = 'data/RESISC45_images.npy'
 
-downsample_to = 96
+downsample_to = 256
 
 
 outfile = f'data/RESISC45_images_{downsample_to}.npy'
