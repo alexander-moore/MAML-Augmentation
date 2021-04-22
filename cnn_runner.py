@@ -319,6 +319,8 @@ def run_experiment(bs, n_epochs, lr, augmentations):
         print(bs, n_epochs, learning_rate, augmentations)
         print(torch.mean(torch.FloatTensor(accs)).data.item(), torch.mean(torch.FloatTensor(actk)).data.item())
 
+        torch.save(CNN.state_dict(), f'trained_models/{bs}_{n_epochs}_{lr}_{augmentations}_CNN.pt')
+
         return torch.mean(torch.FloatTensor(accs)).data.item(), torch.mean(torch.FloatTensor(actk)).data.item()
 
 

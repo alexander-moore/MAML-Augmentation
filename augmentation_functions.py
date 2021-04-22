@@ -12,16 +12,17 @@ import itertools
 import torch
 import torchvision
 from torchvision import transforms
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class addGaussianNoise(object):
     def __init__(self, mean=0.0, std=1.0, p=0.5):
-        self.mean = mean
-        self.std = std
+        self.mean = torch.tensor(mean).to(device)
+        self.std = torch.tensor(std).to(device)
         self.p = p
       
     def __call__(self, img):
         if torch.rand(1).item() < self.p:
-            return img + torch.randn(img.size()) * self.std + self.mean
+            return img + torch.randn(img.size(), device = device) * self.std + self.mean
         return img
         
     def __repr__(self):
@@ -35,10 +36,10 @@ def applyAugs(img_batch, task_idx, num_augs=7):
                       transforms.RandomVerticalFlip(p=0.99),
                       transforms.RandomRotation(359.0, fill=0.5),
                       transforms.RandomPerspective(distortion_scale=0.1, p=0.99, fill=0.5),
-                      transforms.RandomResizedCrop(256,
+                      transforms.RandomResizedCrop(96,
                                                    scale=(0.5, 1.0),
-                                                   ratio=(1.0, 1.0),
-                                                   interpolation=transforms.InterpolationMode.BILINEAR),
+                                                   ratio=(0.8, 1.0)),
+                                                   #interpolation=transforms.InterpolationMode.BILINEAR),
                       addGaussianNoise(std=0.1, p=0.99),
                       # transforms.ColorJitter(saturation=4.0, hue=0.01),
                       transforms.ColorJitter(brightness=0.5, contrast=0.9)
