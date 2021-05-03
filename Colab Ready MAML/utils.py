@@ -94,7 +94,7 @@ def get_data(Params,load=True):
         print(data.shape)
         labels = np.load('/content/drive/MyDrive/Project/data/RESISC45_classes.npy')
         test_size = 0.25
-        xtrain, xtest, ytrain, ytest = train_test_split(data, labels, test_size=Params['trainvalSplit'], stratify=labels)
+        xtrain, xtest, ytrain, ytest = train_test_split(data, labels, test_size=Params['traintestSplit'], stratify=labels)
 
         np.save('/content/drive/MyDrive/Project/data/RESISC45_images_train.npy', xtrain)
         np.save('/content/drive/MyDrive/Project/data/RESISC45_labels_train.npy', ytrain)
