@@ -25,7 +25,7 @@ def taskStructure(dataset,Params,train_labels):
     ]
     taskset = l2l.data.TaskDataset(metaDataset,
                                    transforms,
-                                   num_tasks=math.floor((45*700)/(2*(Params['nways']*Params['kshots']*(Params['outerVSinner']+1))))
+                                   num_tasks=math.floor(Params['trainsz']/((Params['nways']*Params['kshots']*(Params['outerVSinner']+1))))
                                    ) ## generate max number of tasks
     return taskset
 

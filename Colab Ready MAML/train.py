@@ -12,6 +12,7 @@ def train(model, train_tasks, Params, val_loader):  ## go through data set
     meta_optimizer = torch.optim.Adam(model.parameters(), lr=Params['MetaLR'])
     outer_loss = torch.tensor(0., device=device)
     model.zero_grad()
+    seen = 0
     j = 0  # keeping track of tasks seen
     trainacc = []
     trainloss = []
@@ -19,6 +20,7 @@ def train(model, train_tasks, Params, val_loader):  ## go through data set
         i = torch.randint(high=127, size=(1, 1)).item()
         ## call augments on the fly
         x, y = task
+        seen += len(x)
         x = x.float().to(device)
         y = y.long().to(device)
         if Params['aug'] == False:
@@ -48,6 +50,7 @@ def train(model, train_tasks, Params, val_loader):  ## go through data set
             outer_loss.backward()
             meta_optimizer.step()
             outer_loss = torch.tensor(0., device=device)
+    Params['DataSeenPerEpoch']= seen
     return torch.mean(torch.FloatTensor(trainacc)).data.item(), torch.sum(torch.FloatTensor(trainloss)).data.item()
 
 
