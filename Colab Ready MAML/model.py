@@ -38,7 +38,7 @@ class ConvolutionalNeuralNetwork(MetaModule):
             MetaBatchNorm2d(hidden_size ** 10),
             nn.ReLU(),
         )
-        self.classifier = MetaLinear(hidden_size**10, out_features)
+        self.classifier = MetaLinear(self.hidden_size**10, out_features)
 
 
 
