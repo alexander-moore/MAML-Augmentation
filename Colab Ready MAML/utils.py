@@ -17,16 +17,20 @@ def taskStructure(dataset,Params,train_labels):
     for i in range(45):
         labels[i] = [j for j, x in enumerate(train_labels) if x == i]
     metaDataset = l2l.data.MetaDataset(trainDATA,labels_to_indices=labels)
-    if Params['Quincy'] == False:
+    if Params['Quincy'] == False and Params['Alex']==False:
         transforms = [
         ## need kshots*2 for inner and outer loop split accross each task
             l2l.data.transforms.FusedNWaysKShots(metaDataset,n=Params['nways'],k=Params['kshots']*(Params['outerVSinner']+1),replacement=False),
             l2l.data.transforms.LoadData(metaDataset),
             l2l.data.transforms.ConsecutiveLabels(metaDataset)
         ]
-    else:
+    elif Params['Quincy']==True:
         print("doing Quincy's model")
         train_loader = torch.utils.data.DataLoader(dataset, batch_size=int(Params['bs']*2), shuffle=True) #BUG: must keep shuffle false - or else it screws up labels, apparently
+        return train_loader
+    elif Params['Alex']==True:
+        print("doing Alex's model")
+        train_loader = torch.utils.data.DataLoader(dataset, batch_size=int(Params['bs']), shuffle=True) #BUG: must keep shuffle false - or else it screws up labels, apparently
         return train_loader
 
 

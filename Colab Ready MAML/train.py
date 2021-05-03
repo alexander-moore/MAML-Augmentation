@@ -23,6 +23,22 @@ def train(model, train_tasks, Params, val_loader):  ## go through data set
         seen += len(x)
         x = x.float().to(device)
         y = y.long().to(device)
+        if Params['Alex']==True:
+            model.zero_grad()
+            optimizer = torch.optim.Adam(model.parameters(), lr=Params['innerStep'])
+            j=j+1
+            if Params['aug']==True:
+                x = augmentation_functions.applyAugs(x,i)
+            train_logit = model(x)
+            inner_loss = F.cross_entropy(train_logit, y)
+            
+            model.zero_grad()
+            inner_loss.backward()
+            optimizer.step()
+            acc = utils.get_accuracy(train_logit, y)
+            trainacc.append(acc)
+            trainloss.append(inner_loss.div_(len(x)))
+            continue
         if Params['aug'] == False:
             x_inner, x_outer, y_inner, y_outer = utils.tasksplit(x, y, Params)  ## split task for inner/ ouyter with no augs
         else:
@@ -40,7 +56,7 @@ def train(model, train_tasks, Params, val_loader):  ## go through data set
                            params=params)  ## take the loss fucntions using the params of this task specific inner loop
         current_outer_loss = F.cross_entropy(test_logit, y_outer)
         outer_loss += current_outer_loss
-        current_outer_loss.div_(Params['nways'] * Params['kshots'])
+        current_outer_loss.div_(len(x_outer))
         acc = utils.get_accuracy(test_logit, y_outer)
         trainacc.append(acc)
         trainloss.append(current_outer_loss)
