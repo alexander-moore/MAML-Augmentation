@@ -94,7 +94,7 @@ def get_data(Params,load=True):
         print(data.shape)
         labels = np.load('/content/drive/MyDrive/Project/data/RESISC45_classes.npy')
         test_size = 0.25
-        xtrain, xtest, ytrain, ytest = train_test_split(data, labels, test_size=test_size, stratify=labels)
+        xtrain, xtest, ytrain, ytest = train_test_split(data, labels, test_size=Params['trainvalSplit'], stratify=labels)
 
         np.save('/content/drive/MyDrive/Project/data/RESISC45_images_train.npy', xtrain)
         np.save('/content/drive/MyDrive/Project/data/RESISC45_labels_train.npy', ytrain)
@@ -106,7 +106,7 @@ def get_data(Params,load=True):
         classes = np.load('/content/drive/MyDrive/Project/data/RESISC45_class_names.npy')
     img_size = train_data.shape[2]  # can use this to mofidy data size to fit this model (which only takes 256 images)
     c_dim = classes.shape[0]
-    xtrain, xval, ytrain, yval = train_test_split(train_data, train_labels, test_size=Params['trainSplit'])
+    xtrain, xval, ytrain, yval = train_test_split(train_data, train_labels, test_size=Params['trainvalSplit'])
 
     xtrain = torch.tensor(xtrain).permute(0, 3, 1, 2)
     trainset = linkDataset(xtrain,ytrain)
