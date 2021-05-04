@@ -6,7 +6,7 @@ import torch.utils
 from torch.utils.data import Dataset
 import random
 from sklearn.model_selection import train_test_split
-
+import matplotlib.pyplot as plt
 def get_accuracy(logits, targets):
     _, predictions = torch.max(logits, dim=-1)
     return torch.mean(predictions.eq(targets).float())
@@ -87,58 +87,7 @@ class OurDataset(Dataset):
             idx = idx.tolist()
         sample = self.dataset[idx]
         return sample
-def get_data(Params,load=True):
-    np.random.seed(1)
-    random.seed(1)
-    # file = 'data/RESISC45_images_'+str(Params['datasize'])+'.npy'
-    if load:
-        file = '/content/drive/MyDrive/Project/data/RESISC45_images_96.npy'
-        data = (np.load(file)/127.5)-1
-        print(data.shape)
-        print(data.shape)
-        labels = np.load('/content/drive/MyDrive/Project/data/RESISC45_classes.npy')
-        test_size = 0.25
-        xtrain, xtest, ytrain, ytest = train_test_split(data, labels, test_size=Params['traintestSplit'], stratify=labels)
 
-        np.save('/content/drive/MyDrive/Project/data/RESISC45_images_train.npy', xtrain)
-        np.save('/content/drive/MyDrive/Project/data/RESISC45_labels_train.npy', ytrain)
-        np.save('/content/drive/MyDrive/Project/data/RESISC45_images_test.npy', xtest)
-        np.save('/content/drive/MyDrive/Project/data/RESISC45_labels_test.npy', ytest)
-    else:
-        train_data = np.load('/content/drive/MyDrive/Project/data/RESISC45_images_train.npy')
-        train_labels = np.load('/content/drive/MyDrive/Project/data/RESISC45_labels_train.npy')
-        classes = np.load('/content/drive/MyDrive/Project/data/RESISC45_class_names.npy')
-    img_size = train_data.shape[2]  # can use this to mofidy data size to fit this model (which only takes 256 images)
-    c_dim = classes.shape[0]
-    xtrain, xval, ytrain, yval = train_test_split(train_data, train_labels, test_size=Params['trainvalSplit'])
-
-    xtrain = torch.tensor(xtrain).permute(0, 3, 1, 2)
-    trainset = linkDataset(xtrain,ytrain)
-    train_tasks = taskStructure(trainset,Params,ytrain)
-    bs =Params['nways']*Params['kshots']
-    ## Validation Data
-    valset = []
-    xval = torch.tensor(xval).permute(0, 3, 1, 2)
-    valset = linkDataset(xval,yval)
-    val_loader = torch.utils.data.DataLoader(valset, batch_size=512, drop_last=True,
-                                             shuffle=False)  # BUG: must keep shuffle false - or else it screws up labels, apparently
-
-    test_data = np.load('/content/drive/MyDrive/Project/data/RESISC45_images_test.npy')
-    test_labels = np.load('/content/drive/MyDrive/Project/data/RESISC45_labels_test.npy')
-
-    test_data = torch.tensor(test_data)
-    test_labels = torch.tensor(test_labels)
-    ## Testing Data
-    xtest = torch.tensor(test_data).permute(0, 3, 1, 2)
-    testset = linkDataset(xtest,test_labels)
-
-    test_loader = torch.utils.data.DataLoader(testset, batch_size=512, drop_last=True,
-                                              shuffle=False) # BUG: must keep shuffle false - or else it screws up labels, apparently
-    Params['Img_size'] = img_size
-    Params['bs'] = bs
-    Params["c_dim"] = c_dim
-    Params["trainsz"] = len(xtrain)
-    return train_tasks,val_loader,test_loader, Params
 def linkDataset(x,y):
     set = []
     for i in range(len(y)):
@@ -185,30 +134,49 @@ def tasksplit(x,y,Params):
     x_outer = x[~idx]
     y_outer = y[~idx]
     return x_inner, x_outer, y_inner,y_outer
-def colabgetdata(Params,load=False):
+def colabgetdata(Params, load = False):
     np.random.seed(1)
     random.seed(1)
     # file = 'data/RESISC45_images_'+str(Params['datasize'])+'.npy'
-    if load:
-        file = '/content/drive/MyDrive/Project/data/RESISC45_images_96.npy'
-        data = (np.load(file)/127.5)-1
+    if Params['mercer']==True:
+        print('UCmercer')
+        path = Params['path']
+        file = path+ 'Project/data/UCMerced_images96.npy'
+        if load:
+            data = (np.load(file)/127.5)-1
+            print(data.shape)
+            print(data.shape)
+            labels = np.load(path+'Project/data/UCMerced_classes.npy')
+            xtrain, xtest, ytrain, ytest = train_test_split(data, labels, test_size=Params['traintestSplit'], stratify=labels)
 
-        print(data.shape)
-        labels = np.load('/content/drive/MyDrive/Project/data/RESISC45_classes.npy')
-        test_size = 0.25
-        xtrain, xtest, ytrain, ytest = train_test_split(data, labels, test_size=test_size, stratify=labels)
-
-        np.save('/content/drive/MyDrive/Project/data/RESISC45_images_train.npy', xtrain)
-        np.save('/content/drive/MyDrive/Project/data/RESISC45_labels_train.npy', ytrain)
-        np.save('/content/drive/MyDrive/Project/data/RESISC45_images_test.npy', xtest)
-        np.save('/content/drive/MyDrive/Project/data/RESISC45_labels_test.npy', ytest)
+            np.save(path + 'Project/data/UCMerced_images_train.npy', xtrain)
+            np.save(path + 'Project/data/UCMerced_labels_train.npy', ytrain)
+            np.save(path+ 'Project/data/UCMerced_images_test.npy', xtest)
+            np.save(path+ 'Project/data/UCMerced_labels_test.npy', ytest)
+        else:
+            train_data = np.load(path+'Project/data/UCMerced_images_train.npy')
+            train_labels = np.load(path+'/Project/data/UCMerced_labels_train.npy')
+            classes = np.load(path+ 'Project/data/UCMerced_class_names.npy')
     else:
-        train_data = np.load('/content/drive/MyDrive/Project/data/RESISC45_images_train.npy')
-        train_labels = np.load('/content/drive/MyDrive/Project/data/RESISC45_labels_train.npy')
-        classes = np.load('/content/drive/MyDrive/Project/data/RESISC45_class_names.npy')
+        path = Params['path']
+        if load:
+            file = path + 'Project/data/RESISC45_images_96.npy'
+            data = (np.load(file)/127.5)-1
+            labels = np.load(path+ 'Project/data/RESISC45_classes.npy')
+            test_size = 0.25
+            xtrain, xtest, ytrain, ytest = train_test_split(data, labels, test_size=Params['traintestSplit'], stratify=labels)
+
+            np.save(path+'Project/data/RESISC45_images_train.npy', xtrain)
+            np.save(path+'Project/data/RESISC45_labels_train.npy', ytrain)
+            np.save(path+'Project/data/RESISC45_images_test.npy', xtest)
+            np.save(path+'Project/data/RESISC45_labels_test.npy', ytest)
+        else:
+            train_data = np.load(path+ 'Project/data/RESISC45_images_train.npy')
+            train_labels = np.load(path+'Project/data/RESISC45_labels_train.npy')
+            classes = np.load(path+ 'Project/data/RESISC45_class_names.npy')
     img_size = train_data.shape[2]  # can use this to mofidy data size to fit this model (which only takes 256 images)
     c_dim = classes.shape[0]
-    xtrain, xval, ytrain, yval = train_test_split(train_data, train_labels, test_size=0.25)
+    xtrain, xval, ytrain, yval = train_test_split(train_data, train_labels, test_size=Params['trainvalSplit'])
     Params["trainsz"] = len(xtrain)
     bs=32
     Params['bs'] = bs
@@ -216,27 +184,90 @@ def colabgetdata(Params,load=False):
     xtrain = torch.tensor(xtrain).permute(0, 3, 1, 2)
     trainset = linkDataset(xtrain,ytrain)
     train_tasks = taskStructure(trainset,Params,ytrain)
-    bs =Params['nways']*Params['kshots']
     ## Validation Data
     valset = []
     xval = torch.tensor(xval).permute(0, 3, 1, 2)
     valset = linkDataset(xval,yval)
-    val_loader = torch.utils.data.DataLoader(valset, batch_size=512, drop_last=True,
+    val_loader = torch.utils.data.DataLoader(valset, batch_size=32, drop_last=True,
                                              shuffle=False)  # BUG: must keep shuffle false - or else it screws up labels, apparently
-
-    test_data = np.load('/content/drive/MyDrive/Project/data/RESISC45_images_test.npy')
-    test_labels = np.load('/content/drive/MyDrive/Project/data/RESISC45_labels_test.npy')
-
+    if Params['mercer']==True:
+        test_data = np.load(path+'Project/data/UCMerced_images_test.npy')
+        test_labels = np.load(path+'Project/data/UCMerced_labels_test.npy')
+    else:
+        test_data = np.load(path+'Project/data/RESISC45_images_test.npy')
+        test_labels = np.load(path+'Project/data/RESISC45_labels_test.npy')
     test_data = torch.tensor(test_data)
     test_labels = torch.tensor(test_labels)
     ## Testing Data
     xtest = torch.tensor(test_data).permute(0, 3, 1, 2)
     testset = linkDataset(xtest,test_labels)
 
-    test_loader = torch.utils.data.DataLoader(testset, batch_size=512, drop_last=True,
+    test_loader = torch.utils.data.DataLoader(testset, batch_size=32, drop_last=True,
                                               shuffle=False) # BUG: must keep shuffle false - or else it screws up labels, apparently
     Params['Img_size'] = img_size
     Params["c_dim"] = c_dim
 
 
     return train_tasks,val_loader,test_loader, Params
+def make_example(train_loader):
+    print('Shape of a batch of images: ', next(iter(train_loader))[0].shape)
+    print('Shape of a batch of labels: ', next(iter(train_loader))[1].shape)
+
+    first_samp = next(iter(train_loader))[0][0] #get first sample in first batch
+    plt.imshow(first_samp.permute(1,2,0)/255) #show it
+def make_train_plot(MAML_loss_tracker, CNN_loss_tracker, MAML_val_accs, CNN_val_accs, MAML_val_topks, CNN_val_topks, epoch_tracker,Params):
+    #plt.plot(epoch_tracker, MAML_loss_tracker, label = 'MAML train loss')
+    #plt.plot(epoch_tracker, CNN_loss_tracker, label = 'CNN train loss')
+    plt.plot(epoch_tracker, MAML_val_accs, label = 'MAML val acc')
+    plt.plot(epoch_tracker, CNN_val_accs, label = 'CNN val acc')
+    plt.plot(epoch_tracker, MAML_val_topks, label = 'MAML val top3')
+    plt.plot(epoch_tracker, CNN_val_topks, label = 'CNN_val top3')
+    plt.legend(loc = 'best')
+    string = str(Params['innerStep']) + "LR rate "
+    if Params['Alex'] == False:
+        string+=" inner loop, "+ str(Params['MetaLR']) + ' LR outer loop, '
+        if Params['Quincy'] == False:
+            string+= str(Params['outerVSinner'])+' to 1 ratio, '+ str(Params['nways']) +" ways, " + str(Params['kshots']) +" shots,"+str(Params['number_of_tasks']) + " task per outer, " + "first order "
+            if Params['Order']==True:
+                string+="True"
+            else:
+                string+= "False"
+    plt.title(string)
+    plt.show()
+
+def make_two_plots(epoch_tracker, MAML_loss_tracker, CNN_loss_tracker, MAML_val_accs, CNN_val_accs,Params):
+    fig, (ax1, ax2) = plt.subplots(1,2)
+    ax1.plot(epoch_tracker, MAML_loss_tracker, label = 'MAML train loss')
+    ax1.plot(epoch_tracker, CNN_loss_tracker, label = 'CNN train loss')
+    ax1.legend(loc = 'best')
+    ax2.plot(epoch_tracker, MAML_val_accs, label = 'MAML val acc')
+    ax2.plot(epoch_tracker, CNN_val_accs, label = 'CNN val acc')
+    ax2.legend(loc = 'best')
+    string = str(Params['innerStep']) + "LR rate "
+    if Params['Alex'] == False:
+        string+=" inner loop, "+ str(Params['MetaLR']) + ' LR outer loop, '
+        if Params['Quincy'] == False:
+            string+= str(Params['outerVSinner'])+' to 1 ratio, '+ str(Params['nways']) +" ways, " + str(Params['kshots']) +" shots,"+str(Params['number_of_tasks']) + " task per outer, " + "first order "
+            if Params['Order']==True:
+                string+="True"
+            else:
+                string+= "False"
+    plt.title(string)
+    plt.tight_layout()
+    plt.show()
+
+def basic_train_plot(epoch_tracker, MAML_loss_tracker, CNN_loss_tracker,Params):
+    plt.plot(epoch_tracker, MAML_loss_tracker, label = 'MAML train loss')
+    plt.plot(epoch_tracker, CNN_loss_tracker, label = 'CNN train loss')
+    plt.legend(loc = 'best')
+    string = str(Params['innerStep']) + "LR rate "
+    if Params['Alex'] == False:
+        string+=" inner loop, "+ str(Params['MetaLR']) + ' LR outer loop, '
+        if Params['Quincy'] == False:
+            string+= str(Params['outerVSinner'])+' to 1 ratio, '+ str(Params['nways']) +" ways, " + str(Params['kshots']) +" shots,"+str(Params['number_of_tasks']) + " task per outer, " + "first order "
+            if Params['Order']==True:
+                string+="True"
+            else:
+                string+= "False"
+    plt.title(string)
+    plt.show()
