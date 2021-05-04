@@ -134,7 +134,7 @@ def tasksplit(x,y,Params):
     x_outer = x[~idx]
     y_outer = y[~idx]
     return x_inner, x_outer, y_inner,y_outer
-def colabgetdata(Params, load = False):
+def colabgetdata(Params, load = True):
     np.random.seed(1)
     random.seed(1)
     # file = 'data/RESISC45_images_'+str(Params['datasize'])+'.npy'
