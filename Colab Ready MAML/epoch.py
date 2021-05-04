@@ -48,6 +48,7 @@ def epochthrough(train_tasks,Params,val_loader):
 
 def epochMercer(Params,ptfilepath='/content/drive/MyDrive/Project/genMAML.pt'):
     Params['mercer'] = True
+    Params['augs'] = False
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = torch.load(ptfilepath)
     model = model.to(device)
