@@ -60,7 +60,6 @@ def train(model, train_tasks, Params, val_loader):  ## go through data set
         acc = utils.get_accuracy(test_logit, y_outer)
         trainacc.append(acc)
         trainloss.append(current_outer_loss)
-
         j += 1
         if j % Params['number_of_tasks'] == 0:  ## we hit number of tasks if this =0
             outer_loss.backward()

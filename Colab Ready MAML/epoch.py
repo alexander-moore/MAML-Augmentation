@@ -28,6 +28,16 @@ def epochthrough(train_tasks,Params,val_loader):
     plt.plot(epoch_tracker, trainaccc, label = 'train acc')
     plt.plot(epoch_tracker, dataacc, label = 'val acc')
     plt.plot(epoch_tracker, datatopk, label = 'val top3')
-    plt.legend(loc = '.0006 LR rates both')
+    string = str(Params['innerStep']) + "LR rate "
+    if Params['Alex'] == False:
+        string+=" inner loop, "+ str(Params['MetaLR']) + ' LR outer loop, '
+        if Params['Quincy'] == False:
+            string+= str(Params['outerVSinner'])+' to 1 ratio, '+ str(Params['nways']) +" ways, " + str(Params['kshots']) +" shots,"+str(Params['number_of_tasks']) + " task per outer, " + "first order "
+            if Params['Order']==True:
+                string+="True"
+            else:
+                string+= "False"
+    plt.legend()
+    plt.title(string)
     plt.show()
     return Params, trainaccc, trianloss, dataacc, datatopk
