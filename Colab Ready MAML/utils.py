@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 def get_accuracy(logits, targets):
     _, predictions = torch.max(logits, dim=-1)
-    return torch.mean(predictions.eq(targets).float())
+    return torch.mean(predictions.eq(targets).float())*100/(targets.shape[0])
 
 def taskStructure(dataset,Params,train_labels):
     trainDATA = OurDataset(dataset)
@@ -107,9 +107,9 @@ def getvalErr(model,val_loader):
             size = x.shape[0]
             acc_topk = accuracy_topk(yhat, y)
             actk.append(acc_topk.data.item())
-            valcc = (correct / size).data.item()
+            valcc = 100*(correct / size).data.item()
             accs.append(valcc)
-    return torch.mean(torch.FloatTensor(accs)).data.item(), torch.mean(torch.FloatTensor(actk)).data.item()
+    return torch.mean(torch.FloatTensor(accs)).data.item(), 100*torch.mean(torch.FloatTensor(actk)).data.item()
 
 def accuracy_topk(output, target, topk=(3,)):
     # https://forums.fast.ai/t/return-top-k-accuracy/27658
@@ -134,7 +134,7 @@ def tasksplit(x,y,Params):
     x_outer = x[~idx]
     y_outer = y[~idx]
     return x_inner, x_outer, y_inner,y_outer
-def colabgetdata(Params, load = True):
+def colabgetdata(Params,load = False):
     np.random.seed(1)
     random.seed(1)
     # file = 'data/RESISC45_images_'+str(Params['datasize'])+'.npy'
@@ -153,6 +153,9 @@ def colabgetdata(Params, load = True):
             np.save(path + 'Project/data/UCMerced_labels_train.npy', ytrain)
             np.save(path+ 'Project/data/UCMerced_images_test.npy', xtest)
             np.save(path+ 'Project/data/UCMerced_labels_test.npy', ytest)
+            train_data = np.load(path+'Project/data/UCMerced_images_train.npy')
+            train_labels = np.load(path+'/Project/data/UCMerced_labels_train.npy')
+            classes = np.load(path+ 'Project/data/UCMerced_class_names.npy')
         else:
             train_data = np.load(path+'Project/data/UCMerced_images_train.npy')
             train_labels = np.load(path+'/Project/data/UCMerced_labels_train.npy')
@@ -170,12 +173,13 @@ def colabgetdata(Params, load = True):
             np.save(path+'Project/data/RESISC45_labels_train.npy', ytrain)
             np.save(path+'Project/data/RESISC45_images_test.npy', xtest)
             np.save(path+'Project/data/RESISC45_labels_test.npy', ytest)
+        
         else:
             train_data = np.load(path+ 'Project/data/RESISC45_images_train.npy')
             train_labels = np.load(path+'Project/data/RESISC45_labels_train.npy')
             classes = np.load(path+ 'Project/data/RESISC45_class_names.npy')
-    img_size = train_data.shape[2]  # can use this to mofidy data size to fit this model (which only takes 256 images)
-    c_dim = classes.shape[0]
+
+
     xtrain, xval, ytrain, yval = train_test_split(train_data, train_labels, test_size=Params['trainvalSplit'])
     Params["trainsz"] = len(xtrain)
     bs=32
@@ -204,11 +208,11 @@ def colabgetdata(Params, load = True):
 
     test_loader = torch.utils.data.DataLoader(testset, batch_size=32, drop_last=True,
                                               shuffle=False) # BUG: must keep shuffle false - or else it screws up labels, apparently
-    Params['Img_size'] = img_size
-    Params["c_dim"] = c_dim
+    # Params['Img_size'] = img_size
+    # Params["c_dim"] = c_dim
 
 
-    return train_tasks,val_loader,test_loader, Params
+    return train_tasks,val_loader,test_loader, Params,trainset,ytrain
 def make_example(train_loader):
     print('Shape of a batch of images: ', next(iter(train_loader))[0].shape)
     print('Shape of a batch of labels: ', next(iter(train_loader))[1].shape)
