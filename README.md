@@ -2,7 +2,7 @@
 
 Remote sensing is a natural image classification task in which the image content may be at drastically different scales.
 
-Aerial Airport             |  Satellite Archipellago
+Aerial Airport             |  Satellite Archipelago
 :-------------------------:|:-------------------------:
 ![imageLeft](imgs/sample1.png)  |  ![imageRight](imgs/sample2.png)
 
@@ -31,7 +31,7 @@ We induce tasks for the meta learner to simultaneously opimize by compositing au
 
 ![results table](imgs/results_table.png)
 
-Results plot 1             |  Results plot 2
+CNN with augmentation outperforms CNN and MAML             |  MAML behaves like augmented CNN
 :-------------------------:|:-------------------------:
 ![imageLeft](imgs/results_plot1.png)  |  ![imageRight](imgs/results_plot2.png)
 
