@@ -12,7 +12,7 @@ Remote sensing scene classification for this project classifies images taken fro
 Meta Learning is well-developed in supervised natural image tasks, though we are not aware of present research which relies on augmentations to create tasks for a natural image classification task. **We hypothesize that training a meta learner using compositions of image augmentations may lead to a more robust, generalizable model**. Model-agnostic meta learning (MAML) offers improved model performance in few-shot training scenarios and may be able to quickly optimize parameters to datasets with new classes with little fine-tuning.
 
 ## Novelty
-We induce tasks for the meta learner to simultaneously opimize by compositing augmentations. This composition is given by 
+We induce tasks for the meta learner to simultaneously opimize by compositing augmentations. This composition is given by the factorical boolean matrix which enumerates all possible combinations of seven common image transformations:
 
 ![augment image](imgs/aug_table.png)
 
