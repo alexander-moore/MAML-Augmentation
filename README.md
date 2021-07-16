@@ -2,6 +2,10 @@
 
 Remote sensing is a natural image classification task in which the image content may be at drastically different scales.
 
+Solarized dark             |  Solarized Ocean
+:-------------------------:|:-------------------------:
+![imageLeft](images/sample1.png)  |  ![imageRight](images/sample2.png)
+
 Remote sensing scene classification for this project classifies images taken from airborne or spaceborne sensors, creating challenges for previous work including:
 - Poor generalization across datasets
 - Data variance between training and testing sets
