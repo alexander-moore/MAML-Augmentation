@@ -14,7 +14,7 @@ Meta Learning is well-developed in supervised natural image tasks, though we are
 ## Novelty
 We induce tasks for the meta learner to simultaneously opimize by compositing augmentations. This composition is given by 
 
-![augment image](imgs/augments.png)
+![augment image](imgs/aug_table.png)
 
 ## Data Set
 * NWPU - RESISC45
