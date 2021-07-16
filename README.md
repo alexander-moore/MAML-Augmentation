@@ -4,7 +4,7 @@ Remote sensing is a natural image classification task in which the image content
 
 Solarized dark             |  Solarized Ocean
 :-------------------------:|:-------------------------:
-![imageLeft](images/sample1.png)  |  ![imageRight](images/sample2.png)
+![imageLeft](imgs/sample1.png)  |  ![imageRight](imgs/sample2.png)
 
 Remote sensing scene classification for this project classifies images taken from airborne or spaceborne sensors, creating challenges for previous work including:
 - Poor generalization across datasets
@@ -26,6 +26,14 @@ We induce tasks for the meta learner to simultaneously opimize by compositing au
 
 * UC Merced Land Use
      - 2,100 USGS National Map Urban Imagery (256x256x3) images over 21 classes
+
+## Results
+
+![results table](imgs/results_table.png)
+
+Solarized dark             |  Solarized Ocean
+:-------------------------:|:-------------------------:
+![imageLeft](imgs/results_plot1.png)  |  ![imageRight](imgs/results_plot2.png)
 
 ## Challenges
 - Image variance in scale and resolution
